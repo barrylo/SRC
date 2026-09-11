@@ -93,6 +93,7 @@ Invoke-RestMethod -Method Put -Uri "http://localhost:3000/api/tasks/$id" -Body $
 **Docker**
 - A `Dockerfile` is included in the project root and exposes port `3000`.
 - A `docker-compose.yml` file is also available to map `./data` into the container and restart the service automatically.
+- Database persistence: Docker Compose bind-mounts the host `data` directory to `/app/data`, so `data/tasks.db` survives container recreation and image rebuilds. Do not remove this volume mapping when deploying.
 
 Run with Docker:
 
@@ -105,6 +106,12 @@ Run with Docker Compose:
 
 ```bash
 docker compose up --build
+```
+
+Back up the persistent database from PowerShell:
+
+```powershell
+Copy-Item .\data\tasks.db .\data\tasks.db.backup
 ```
 
 Then open: http://localhost:3000
