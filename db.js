@@ -34,7 +34,7 @@ const S3_ENDPOINT = normalizeEndpoint(process.env.S3_ENDPOINT);
 const s3 = cloudStorageEnabled
   ? new S3Client({
       region: process.env.AWS_REGION || 'us-east-005',
-  endpoint: S3_ENDPOINT,
+      endpoint: S3_ENDPOINT,
       forcePathStyle: true,
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
