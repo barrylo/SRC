@@ -15,6 +15,11 @@ const DB_KEY = process.env.S3_DB_KEY || 'tasks.db';
 const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 const CONTAINER_ID = `${process.pid}-${Date.now()}`;
 
+function normalizeEndpoint(endpoint) {
+  if (!endpoint) return endpoint;
+  return /^[a-z][a-z\d+.-]*:\/\//i.test(endpoint) ? endpoint : `https://${endpoint}`;
+}
+
 let lockHeld = false;
 
 const cloudStorageEnabled = Boolean(
@@ -24,10 +29,12 @@ const cloudStorageEnabled = Boolean(
   process.env.AWS_SECRET_ACCESS_KEY,
 );
 
+const S3_ENDPOINT = normalizeEndpoint(process.env.S3_ENDPOINT);
+
 const s3 = cloudStorageEnabled
   ? new S3Client({
       region: process.env.AWS_REGION || 'us-east-005',
-      endpoint: process.env.S3_ENDPOINT,
+  endpoint: S3_ENDPOINT,
       forcePathStyle: true,
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
