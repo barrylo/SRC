@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Temperature Converter</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Temperature Converter</h1>
+      </header>
+      <main>
+        <form id="converter">
+          <div>
+            <label>Value <input id="value" type="number" step="any" required /></label>
+          </div>
+          <div>
+            <label>From
+              <select id="from">
+                <option value="C">Celsius</option>
+                <option value="F">Fahrenheit</option>
+                <option value="K">Kelvin</option>
+              </select>
+            </label>
+          </div>
+          <div>
+            <label>To
+              <select id="to">
+                <option value="F">Fahrenheit</option>
+                <option value="C">Celsius</option>
+                <option value="K">Kelvin</option>
+              </select>
+            </label>
+          </div>
+          <div style="margin-top:12px;">
+            <button type="submit">Convert</button>
+          </div>
+        </form>
+        <pre id="result" style="margin-top:12px;"></pre>
+        <section style="margin-top:16px; padding:12px; background:#f5f5f5; border-radius:4px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Recent Conversions</h3>
+            <div style="display:flex; gap:8px;">
+              <button id="export-history" type="button" style="padding:6px 12px; background:#27ae60; color:white; border:none; border-radius:3px; cursor:pointer; font-size:12px;">Export CSV</button>
+              <button id="clear-history" type="button" style="padding:6px 12px; background:#e74c3c; color:white; border:none; border-radius:3px; cursor:pointer; font-size:12px;">Clear</button>
+            </div>
+          </div>
+          <ul id="history" style="max-height:200px; overflow-y:auto; list-style:none; padding:0; margin:8px 0 0 0; font-size:13px;"></ul>
+          <p id="history-empty" style="margin:8px 0; color:#999; font-size:13px;">No conversions yet</p>
+        </section>
+      </main>
+    </div>
+    <script src="/temp-converter.js"></script>
+  </body>
+</html>

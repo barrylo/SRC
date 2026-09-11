@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Rental Management</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="brand">
+          <img src="/icon.svg" alt="Rental icon" class="app-icon" />
+          <div>
+            <h1>Rental Management</h1>
+            <p class="lead">Single-page responsive rental interface for tenant profiles and monthly rental line items.</p>
+          </div>
+        </div>
+      </header>
+
+      <div class="card">
+        <form id="profile-form">
+          <label>
+            Lastname
+            <input id="lastname" placeholder="Lastname" required />
+          </label>
+          <label>
+            Firstname
+            <input id="firstname" placeholder="Firstname" required />
+          </label>
+          <label>
+            Rental
+            <input id="rental" type="number" step="0.01" min="0" placeholder="Monthly rental" required />
+          </label>
+          <label>
+            Room
+            <input id="room" placeholder="Room number" />
+          </label>
+          <label>
+            Address
+            <input id="address" placeholder="Tenant address" />
+          </label>
+          <label>
+            Status
+            <select id="status">
+              <option value="Active">Active</option>
+              <option value="Pending">Pending</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </label>
+          <button type="submit">Create Tenant Profile</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2 style="margin-top:0;">Tenant Profiles</h2>
+        <div id="profile-list" style="display:grid; gap:14px;"></div>
+      </div>
+
+      <div class="card" id="line-items-panel" style="display:none;">
+        <h2 id="line-items-title">Line Items</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Month</th>
+                <th>Rental</th>
+                <th>Previous Elec</th>
+                <th>Current Elec</th>
+                <th>Electricity Fees</th>
+                <th>Water Fees</th>
+                <th>Total</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="line-items-table"></tbody>
+          </table>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+          <button id="print-receipt-btn" type="button" style="background:#2563eb; color:white; padding:8px 14px; border:none; border-radius:4px; cursor:pointer;">Print Receipt</button>
+          <button id="print-all-current-month-receipts-btn" type="button" style="background:#16a34a; color:white; padding:8px 14px; border:none; border-radius:4px; cursor:pointer;">Print All Current Month Receipts</button>
+        </div>
+      </div>
+
+      <div class="card" id="edit-line-items-panel" style="display:none;">
+        <h2>Manage Rental for <span id="selected-tenant-name"></span></h2>
+        <form id="line-item-form">
+          <label>
+            Month
+            <input id="line-item-month" type="month" required />
+          </label>
+          <label>
+            Previous Month Elec Read
+            <input id="prev-elec-read" type="number" min="0" required />
+          </label>
+          <label>
+            Current Month Elec Read
+            <input id="curr-elec-read" type="number" min="0" required />
+          </label>
+          <label>
+            Electricity Fees
+            <input id="electricity-fees" type="number" step="0.01" min="0" required />
+          </label>
+          <label>
+            Water Fees
+            <input id="water-fees" type="number" step="0.01" min="0" required />
+          </label>
+          <label>
+            Total
+            <input id="line-item-total" type="number" step="0.01" min="0" required />
+          </label>
+          <button type="submit">Save Rental Line Item</button>
+        </form>
+        <button id="close-edit-panel" type="button" style="margin-top:12px; background:#666; color:white; padding:8px 14px; border:none; border-radius:4px; cursor:pointer;">Close</button>
+      </div>
+    </div>
+    <script src="/rental.js"></script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    image: daily-tasks
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+  flask:
+    build: ./flask_app
+    image: temp-converter
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./flask_app:/app
+    environment:
+      - PORT=5000
+    restart: unless-stopped

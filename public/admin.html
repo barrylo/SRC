@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin - Tasks DB</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Admin — Tasks DB</h1>
+      <div style="margin-bottom:12px">
+        <button id="refresh">Refresh</button>
+        <button id="export">Export JSON</button>
+      </div>
+      <table id="table" style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr>
+            <th style="text-align:left">ID</th>
+            <th style="text-align:left">Title</th>
+            <th style="text-align:left">Due</th>
+            <th style="text-align:left">Category</th>
+            <th style="text-align:left">Priority</th>
+            <th style="text-align:left">Notes</th>
+            <th style="text-align:left">Done</th>
+            <th style="text-align:left">Created At</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <pre id="raw" style="margin-top:12px;max-height:300px;overflow:auto;background:#fff;padding:10px;border-radius:6px;border:1px solid #e6e9ef"></pre>
+    </div>
+    <script src="/admin.js"></script>
+  </body>
+</html>

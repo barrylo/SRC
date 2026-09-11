@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Checkout</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Checkout</h1>
+      </header>
+
+      <form id="checkout-form">
+        <div id="guest-toggle-row">
+          <label style="display:flex;align-items:center;gap:8px;">
+            <input id="guest-toggle" type="checkbox" checked />
+            <strong>Checkout as Guest</strong>
+          </label>
+          <p class="muted">Only email, shipping address, and payment required.</p>
+        </div>
+
+        <div>
+          <label>Email <input id="email" type="email" required /></label>
+        </div>
+
+        <div>
+          <label>Shipping Address <input id="shipping" required /></label>
+        </div>
+
+        <div id="account-section" style="margin-top:12px;">
+          <p>Create an account (optional)</p>
+          <label>Password <input id="password" type="password" /></label>
+        </div>
+
+        <div style="margin-top:12px;">
+          <button type="submit">Place Order</button>
+        </div>
+      </form>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>
