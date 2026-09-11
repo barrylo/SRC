@@ -93,7 +93,8 @@ Invoke-RestMethod -Method Put -Uri "http://localhost:3000/api/tasks/$id" -Body $
 **Docker**
 - A `Dockerfile` is included in the project root and exposes port `3000`.
 - A `docker-compose.yml` file is also available to map `./data` into the container and restart the service automatically.
-- Database persistence: Docker Compose bind-mounts the host `data` directory to `/app/data`, so `data/tasks.db` survives container recreation and image rebuilds. Do not remove this volume mapping when deploying.
+- Database persistence: Docker Compose mounts the named `daily_tasks_data` volume at `/app/data`, so `tasks.db` survives container recreation and image rebuilds. Do not remove this volume mapping when deploying.
+- SnapDeploy persistence: attach a persistent volume to `/app/data` (or set `DATA_DIR` to the platform's persistent storage path). Container-local storage is ephemeral and will be lost when SnapDeploy replaces the container.
 
 Run with Docker:
 
@@ -108,10 +109,10 @@ Run with Docker Compose:
 docker compose up --build
 ```
 
-Back up the persistent database from PowerShell:
+Back up the persistent database from PowerShell when using the local Compose volume:
 
 ```powershell
-Copy-Item .\data\tasks.db .\data\tasks.db.backup
+docker run --rm -v src_daily_tasks_data:/data -v "${PWD}\data:/backup" alpine cp /data/tasks.db /backup/tasks.db.backup
 ```
 
 Then open: http://localhost:3000

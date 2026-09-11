@@ -6,11 +6,12 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./data:/app/data
+      - daily_tasks_data:/app/data
     environment:
       - NODE_ENV=production
       - PORT=3000
     restart: unless-stopped
+
   flask:
     build: ./flask_app
     image: temp-converter
@@ -21,3 +22,6 @@ services:
     environment:
       - PORT=5000
     restart: unless-stopped
+
+volumes:
+  daily_tasks_data:
