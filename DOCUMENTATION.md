@@ -186,3 +186,5 @@ explorer.exe /select,"C:\Users\barry\Desktop\daily-tasks.tar"
 - Replace `sql.js` with Postgres for multi-user deployments.
 
 If you'd like, I can add a `Dockerfile`, CI config, or automated tests next — which would you prefer?
+
+version 1.0
