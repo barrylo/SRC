@@ -187,4 +187,4 @@ explorer.exe /select,"C:\Users\barry\Desktop\daily-tasks.tar"
 
 If you'd like, I can add a `Dockerfile`, CI config, or automated tests next — which would you prefer?
 
-version 1.0
+version 1.0.1
