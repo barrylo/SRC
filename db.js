@@ -34,7 +34,7 @@ const forcePathStyle = process.env.S3_FORCE_PATH_STYLE === 'true';
 
 const s3 = cloudStorageEnabled
   ? new S3Client({
-      region: process.env.AWS_REGION || 'us-east-005',
+      region: process.env.AWS_REGION /*|| 'us-east-005'*/,
       endpoint: S3_ENDPOINT,
   forcePathStyle,
       credentials: {
