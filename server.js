@@ -7,7 +7,7 @@ const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const JSON_FILE = path.join(DATA_DIR, 'tasks.json');
 const DB_FILE = path.join(DATA_DIR, 'tasks.db');
 
-const { initDatabase, backupDatabase, releaseLock } = require('./db');
+/*const { initDatabase, backupDatabase, releaseLock } = require('./db');
 
 const handleShutdown = async () => {
   console.log('Received termination signal. Executing safe shutdown sequence...');
@@ -27,6 +27,7 @@ const handleShutdown = async () => {
 
 process.on('SIGTERM', handleShutdown);
 process.on('SIGINT', handleShutdown);
+*/
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -306,7 +307,7 @@ function startServer() {
 
 (async () => {
   try {
-    await initDatabase();
+    // await initDatabase();
     SQL = await initSqlJs();
     if (fs.existsSync(DB_FILE)) {
       const filebuffer = fs.readFileSync(DB_FILE);
