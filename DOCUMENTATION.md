@@ -95,6 +95,7 @@ Invoke-RestMethod -Method Put -Uri "http://localhost:3000/api/tasks/$id" -Body $
 - A `docker-compose.yml` file is also available to map `./data` into the container and restart the service automatically.
 - Database persistence: Docker Compose mounts the named `daily_tasks_data` volume at `/app/data`, so `tasks.db` survives container recreation and image rebuilds. Do not remove this volume mapping when deploying.
 - SnapDeploy persistence: attach a persistent volume to `/app/data` (or set `DATA_DIR` to the platform's persistent storage path). Container-local storage is ephemeral and will be lost when SnapDeploy replaces the container.
+- Optional S3-compatible database sync requires `S3_BUCKET_NAME`, `S3_ENDPOINT`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `AWS_REGION`. Set `S3_ENDPOINT` to the provider's S3 API endpoint, not its web console URL. The client uses virtual-hosted bucket addressing by default; set `S3_FORCE_PATH_STYLE=true` only for providers that require path-style requests (such as a local MinIO endpoint).
 
 Run with Docker:
 

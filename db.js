@@ -30,12 +30,13 @@ const cloudStorageEnabled = Boolean(
 );
 
 const S3_ENDPOINT = normalizeEndpoint(process.env.S3_ENDPOINT);
+const forcePathStyle = process.env.S3_FORCE_PATH_STYLE === 'true';
 
 const s3 = cloudStorageEnabled
   ? new S3Client({
       region: process.env.AWS_REGION || 'us-east-005',
       endpoint: S3_ENDPOINT,
-      forcePathStyle: true,
+  forcePathStyle,
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
