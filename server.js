@@ -2,37 +2,117 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const initSqlJs = require('sql.js');
+//const B2 = require('@backblaze/b2');
+const B2 = require('backblaze-b2');
+
 
 const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const JSON_FILE = path.join(DATA_DIR, 'tasks.json');
 const DB_FILE = path.join(DATA_DIR, 'tasks.db');
+const PORT = process.env.PORT || 3000;
 
-/*const { initDatabase, backupDatabase, releaseLock } = require('./db');
+// 初始化 Backblaze B2 客戶端
+const b2 = new B2({
+  applicationKeyId: process.env.B2_APPLICATION_KEY_ID,
+  applicationKey: process.env.B2_APPLICATION_KEY
+});
+const BUCKET_ID = process.env.B2_BUCKET_ID;
+const BUCKET_NAME = process.env.B2_BUCKET_NAME;
+const B2_DB_FILENAME = 'tasks.db'; // 雲端儲存的檔名
 
+if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+
+let SQL;
+let db;
+let b2Authorized = false;
+
+// 認證 B2 服務
+async function authorizeB2() {
+  if (b2Authorized) return;
+  try {
+    if (!process.env.B2_APPLICATION_KEY_ID || !process.env.B2_APPLICATION_KEY) {
+      console.warn('⚠️ Backblaze B2 環境變數未設定，將跳過雲端同步功能。');
+      return;
+    }
+    await b2.authorize();
+    b2Authorized = true;
+    console.log('✅ Backblaze B2 認證成功');
+  } catch (error) {
+    console.error('❌ Backblaze B2 認證失敗:', error.message);
+  }
+}
+
+// 从 B2 下载数据库
+async function downloadDbFromB2() {
+  await authorizeB2();
+  if (!b2Authorized) return;
+
+  try {
+    console.log('🔄 正在檢查雲端備份...');
+    const response = await b2.downloadFileByName({
+      bucketName: BUCKET_NAME,
+      fileName: B2_DB_FILENAME,
+      responseType: 'arraybuffer'
+    });
+
+    if (response && response.data) {
+      fs.writeFileSync(DB_FILE, Buffer.from(response.data));
+      console.log('✅ 成功從 Backblaze B2 同步並覆蓋本地資料庫。');
+    }
+  } catch (error) {
+    if (error.status === 404) {
+      console.log('ℹ️ 雲端尚未有備份檔案，將使用本地資料庫或創建新資料庫。');
+    } else {
+      console.error('❌ 從 B2 下載資料庫失敗:', error.message);
+    }
+  }
+}
+
+// 上传数据库至 B2
+async function uploadDbToB2() {
+  await authorizeB2();
+  if (!b2Authorized) return;
+
+  try {
+    if (!fs.existsSync(DB_FILE)) return;
+    const fileBuffer = fs.readFileSync(DB_FILE);
+
+    // 獲取上傳 URL
+    const uploadUrlResponse = await b2.getUploadUrl({ bucketId: BUCKET_ID });
+    const { uploadUrl, authorizationToken } = uploadUrlResponse.data;
+
+    // 執行上傳
+    await b2.uploadFile({
+      uploadUrl: uploadUrl,
+      uploadAuthToken: authorizationToken,
+      fileName: B2_DB_FILENAME,
+      data: fileBuffer
+    });
+    console.log('🚀 資料庫已成功同步備份至 Backblaze B2。');
+  } catch (error) {
+    console.error('❌ 同步至 Backblaze B2 失敗:', error.message);
+  }
+}
+
+// 安全停机处理机制
 const handleShutdown = async () => {
   console.log('Received termination signal. Executing safe shutdown sequence...');
   try {
     if (db) {
-      persistDb();
+      persistDb(); // 確保記憶體資料寫入本地
       db.close();
     }
-    await backupDatabase();
+    console.log('正在執行最後一次雲端同步...');
+    await uploadDbToB2(); // 確保停機前最後一次同步
   } catch (error) {
     console.error('Database backup failed during shutdown:', error.message);
   } finally {
-    await releaseLock();
     process.exit(0);
   }
 };
 
 process.on('SIGTERM', handleShutdown);
 process.on('SIGINT', handleShutdown);
-*/
-
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-
-let SQL;
-let db;
 
 function rowsFromStmt(stmt) {
   const rows = [];
@@ -48,11 +128,13 @@ function rowsFromStmt(stmt) {
 function persistDb() {
   const data = db.export();
   fs.writeFileSync(DB_FILE, Buffer.from(data));
+  // 異步觸發雲端上傳，不阻塞 API 回應
+  uploadDbToB2().catch(err => console.error('背景同步錯誤:', err.message));
 }
 
 function ensureSchemaColumns() {
   const res = db.exec('PRAGMA table_info(tasks)');
-  const columns = res[0] && res[0].values ? res[0].values.map(row => row[1]) : [];
+  const columns = res && res[0] && res[0].values ? res[0].values.map(row => row[1]) : [];
   if (!columns.includes('category')) {
     db.run('ALTER TABLE tasks ADD COLUMN category TEXT');
   }
@@ -103,12 +185,6 @@ function readProfileLineItems(profileId) {
   return rowsFromStmt(stmt);
 }
 
-// Migrate existing JSON file into SQLite if DB is empty
-// Migration will be handled during async init below for sql.js
-
-// API routes are registered in startServer so they attach to the running app
-
-const PORT = process.env.PORT || 3000;
 function startServer() {
   const app = express();
   app.use(express.json());
@@ -118,7 +194,6 @@ function startServer() {
     res.json(readTasks());
   });
 
-  // Admin API: view DB contents
   app.get('/api/admin/tasks', (req, res) => {
     try {
       res.json(readTasks());
@@ -210,7 +285,7 @@ function startServer() {
       del.run([lineItemId]);
       del.free();
       persistDb();
-      res.json({ success: true, deleted: rows[0] });
+      res.json({ success: true, deleted: rows });
     } catch (e) {
       res.status(500).json({ error: String(e) });
     }
@@ -238,13 +313,12 @@ function startServer() {
       delProfile.run([profileId]);
       delProfile.free();
       persistDb();
-      res.json({ success: true, deleted: rows[0] });
+      res.json({ success: true, deleted: rows });
     } catch (e) {
       res.status(500).json({ error: String(e) });
     }
   });
 
-  // Admin UI route (redirect to static file)
   app.get('/admin', (req, res) => res.redirect('/admin.html'));
 
   app.post('/api/tasks', (req, res) => {
@@ -281,7 +355,7 @@ function startServer() {
     upd.free();
     const stmt = db.prepare('SELECT id, title, due, category, priority, notes, done, createdAt FROM tasks WHERE id = ?');
     stmt.bind([id]);
-    const task = rowsFromStmt(stmt)[0];
+    const task = rowsFromStmt(stmt);
     persistDb();
     res.json(task);
   });
@@ -300,14 +374,14 @@ function startServer() {
     res.json(existing);
   });
 
-  // The other routes are already defined above and will use the `db` in scope
-
   app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
 }
 
 (async () => {
   try {
-    // await initDatabase();
+    // 1. 啟動時先從 Backblaze B2 同步最新資料庫檔案
+    await downloadDbFromB2();
+
     SQL = await initSqlJs();
     if (fs.existsSync(DB_FILE)) {
       const filebuffer = fs.readFileSync(DB_FILE);
@@ -318,7 +392,7 @@ function startServer() {
       db = new SQL.Database();
       db.run(`CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY, title TEXT NOT NULL, due TEXT, category TEXT, priority TEXT, notes TEXT, done INTEGER DEFAULT 0, createdAt TEXT)`);
       ensureRentalSchema();
-      // migrate JSON if present
+
       if (fs.existsSync(JSON_FILE)) {
         try {
           const existing = JSON.parse(fs.readFileSync(JSON_FILE, 'utf8') || '[]');
@@ -341,4 +415,3 @@ function startServer() {
     process.exit(1);
   }
 })();
-
