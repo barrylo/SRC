@@ -7,7 +7,7 @@ async function convertTemp(e) {
   resultEl.textContent = 'Converting...';
 
   try {
-    const res = await fetch('http://localhost:5000/convert', {
+    const res = await fetch('https://rental-1d10e.containers.snapdeploy.app/convert', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ value: Number(value), from, to })
@@ -28,7 +28,7 @@ async function loadHistory() {
   const emptyEl = document.getElementById('history-empty');
   histEl.innerHTML = '';
   try {
-    const res = await fetch('http://localhost:5000/history');
+    const res = await fetch('https://rental-1d10e.containers.snapdeploy.app/history');
     const data = await res.json();
     if (data.length === 0) {
       emptyEl.style.display = 'block';
@@ -56,7 +56,7 @@ loadHistory().catch(()=>{});
 document.getElementById('clear-history').addEventListener('click', async () => {
   if (!confirm('Clear all history?')) return;
   try {
-    await fetch('http://localhost:5000/history/clear', { method: 'POST' });
+    await fetch('https://rental-1d10e.containers.snapdeploy.app/history/clear', { method: 'POST' });
     await loadHistory();
   } catch (e) {
     alert('Error clearing history: ' + e.message);
@@ -66,7 +66,7 @@ document.getElementById('clear-history').addEventListener('click', async () => {
 // export to csv button handler
 document.getElementById('export-history').addEventListener('click', async () => {
   try {
-    const res = await fetch('http://localhost:5000/history');
+    const res = await fetch('https://rental-1d10e.containers.snapdeploy.app/history');
     const data = await res.json();
     if (data.length === 0) {
       alert('No history to export');
