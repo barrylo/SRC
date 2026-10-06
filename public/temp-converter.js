@@ -53,6 +53,7 @@ async function loadHistory() {
 loadHistory().catch(()=>{});
 
 // clear history button handler
+//http://localhost:5000
 document.getElementById('clear-history').addEventListener('click', async () => {
   if (!confirm('Clear all history?')) return;
   try {
